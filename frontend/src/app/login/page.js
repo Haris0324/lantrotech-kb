@@ -16,15 +16,25 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    await performLogin(email, password);
+  };
+
+  const performLogin = async (loginEmail, loginPassword) => {
     setIsSubmitting(true);
     setError('');
     try {
-      await login(email, password);
+      await login(loginEmail, loginPassword);
       router.push('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
       setIsSubmitting(false);
     }
+  };
+
+  const handleAdminLogin = () => {
+    setEmail('admin@lantrotech.com');
+    setPassword('lantrotech123@');
+    performLogin('admin@lantrotech.com', 'lantrotech123@');
   };
 
   return (
@@ -87,13 +97,24 @@ export default function Login() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30"
-            >
-              {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : 'Sign in'}
-            </button>
+            <div className="space-y-3">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30"
+              >
+                {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : 'Sign in'}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleAdminLogin}
+                disabled={isSubmitting}
+                className="group relative w-full flex justify-center py-3 px-4 border border-slate-600 text-sm font-medium rounded-lg text-white bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 focus:ring-offset-slate-900 transition-all disabled:opacity-50"
+              >
+                Log in as Admin
+              </button>
+            </div>
           </form>
           
           <p className="text-center text-sm text-slate-400">

@@ -6,7 +6,24 @@ const { Server } = require('socket.io');
 const connectDB = require('./config/db');
 
 // Connect to database
-connectDB();
+connectDB().then(async () => {
+  const User = require('./models/User');
+  try {
+    const adminExists = await User.findOne({ email: 'admin@lantrotech.com' });
+    if (!adminExists) {
+      await User.create({
+        name: 'System Admin',
+        email: 'admin@lantrotech.com',
+        password: 'lantrotech123@',
+        role: 'admin',
+        department: 'Administration'
+      });
+      console.log('Default Admin user created.');
+    }
+  } catch (err) {
+    console.error('Error seeding admin user:', err);
+  }
+});
 
 const app = express();
 const server = http.createServer(app);
