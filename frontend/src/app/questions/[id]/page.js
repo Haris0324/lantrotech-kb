@@ -288,6 +288,7 @@ export default function QuestionDetail({ params }) {
                       </div>
                     </div>
                   </div>
+                </div>
               </div>
             );
           })}

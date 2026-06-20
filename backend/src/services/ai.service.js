@@ -4,8 +4,8 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'dummy_key_for_init');
 
 const verifyAnswerWithAI = async (questionContent, answerContent) => {
-  if (!process.env.GEMINI_API_KEY) {
-    return { status: 'pending', suggestion: 'Gemini API Key not configured' };
+  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'dummy_key_for_init') {
+    return { status: 'flagged', suggestion: 'AI Service currently disabled (No API Key).' };
   }
   
   try {
@@ -31,11 +31,11 @@ Respond strictly in the above format.`;
     } else if (responseText.startsWith('CORRECTED')) {
       return { status: 'corrected', suggestion: responseText.replace('CORRECTED - ', '') };
     } else {
-      return { status: 'pending', suggestion: 'AI could not definitively verify.' };
+      return { status: 'flagged', suggestion: 'AI could not definitively verify.' };
     }
   } catch (error) {
     console.error('AI Verification Error:', error);
-    return { status: 'pending', suggestion: 'AI verification failed' };
+    return { status: 'flagged', suggestion: 'AI verification failed or unavailable' };
   }
 };
 
