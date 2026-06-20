@@ -111,6 +111,13 @@ export default function Login() {
               >
                 {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : 'Sign in'}
               </button>
+              <button
+                type="button"
+                onClick={() => setEmail('admin@lantrotech.com')}
+                className="w-full flex justify-center py-3 px-4 border border-slate-700 text-sm font-medium rounded-lg text-slate-300 bg-slate-800/50 hover:bg-slate-700/50 focus:outline-none transition-all"
+              >
+                Login as Admin (Fill Email)
+              </button>
             </div>
           </form>
           

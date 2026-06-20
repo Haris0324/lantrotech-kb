@@ -72,6 +72,8 @@ export default function AdminDashboard() {
     </div>
   );
 
+  if (!user || (user.role !== 'admin' && user.role !== 'hr')) return null;
+
   return (
     <>
       <Navbar />
