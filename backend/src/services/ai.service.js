@@ -9,7 +9,7 @@ const verifyAnswerWithAI = async (questionContent, answerContent) => {
   }
   
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
     const prompt = `You are an AI assistant for a corporate knowledge base.
 Question: "${questionContent}"
 Answer provided: "${answerContent}"
@@ -43,7 +43,7 @@ const generateInsights = async (questions) => {
   if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'dummy_key_for_init') return "AI Service currently disabled (No API Key).";
   
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
     const questionText = questions.map(q => q.title).join('\n');
     const prompt = `Analyze these recent employee questions to identify knowledge gaps and trends. 
 Please structure your response in Markdown with EXACTLY these three sections:
@@ -64,23 +64,7 @@ ${questionText}`;
     return result.response.text();
   } catch (error) {
     console.error('AI Insights Error:', error);
-    let availableModels = 'Could not fetch available models.';
-    try {
-      if (process.env.GEMINI_API_KEY) {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
-        if (response.ok) {
-          const data = await response.json();
-          const names = data.models?.map(m => m.name.replace('models/', '')).join(', ');
-          if (names) availableModels = names;
-        }
-      }
-    } catch (e) {}
-    
-    return `Failed to generate insights. Error: ${error.message}. 
-    
-Available Models for your API Key: ${availableModels}
-
-Please update the code in \`backend/src/services/ai.service.js\` to use one of these models.`;
+    return `Failed to generate insights. Error: ${error.message}`;
   }
 };
 
