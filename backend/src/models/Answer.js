@@ -8,6 +8,7 @@ const AnswerSchema = new mongoose.Schema({
   downvotes: { type: Number, default: 0 },
   isAccepted: { type: Boolean, default: false },
   isOfficial: { type: Boolean, default: false },
+  isPinned: { type: Boolean, default: false },
   aiFeedback: {
     status: { type: String, enum: ['pending', 'verified', 'flagged', 'corrected'], default: 'pending' },
     suggestion: { type: String },

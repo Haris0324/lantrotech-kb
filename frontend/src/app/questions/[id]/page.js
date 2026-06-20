@@ -5,7 +5,7 @@ import api from '@/lib/axios';
 import { useAuth } from '@/context/AuthContext';
 import { useSocket } from '@/context/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
-import { ThumbsUp, ThumbsDown, CheckCircle, Bot, Loader2, Send } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, CheckCircle, Bot, Loader2, Send, Pin, ShieldCheck } from 'lucide-react';
 
 export default function QuestionDetail({ params }) {
   const { id } = use(params);
@@ -48,12 +48,27 @@ export default function QuestionDetail({ params }) {
         ));
       });
 
+      socket.on('answerPinned', ({ answerId, isPinned }) => {
+        setAnswers(prev => {
+          const updated = prev.map(a => a._id === answerId ? { ...a, isPinned } : a);
+          return updated.sort((a, b) => (b.isPinned === a.isPinned) ? (b.isAccepted - a.isAccepted) : (b.isPinned ? 1 : -1));
+        });
+      });
+
+      socket.on('answerOfficial', ({ answerId, isOfficial }) => {
+        setAnswers(prev => prev.map(a => 
+          a._id === answerId ? { ...a, isOfficial } : a
+        ));
+      });
+
       return () => {
         socket.emit('leaveQuestion', id);
         socket.off('newAnswer');
         socket.off('answerVoted');
         socket.off('answerAccepted');
         socket.off('answerAIUpdated');
+        socket.off('answerPinned');
+        socket.off('answerOfficial');
       };
     }
   }, [socket, id]);
@@ -97,6 +112,22 @@ export default function QuestionDetail({ params }) {
   const handleAccept = async (answerId) => {
     try {
       await api.put(`/answers/${answerId}/accept`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleTogglePin = async (answerId) => {
+    try {
+      await api.put(`/answers/${answerId}/pin`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleToggleOfficial = async (answerId) => {
+    try {
+      await api.put(`/answers/${answerId}/official`);
     } catch (error) {
       console.error(error);
     }
@@ -162,6 +193,18 @@ export default function QuestionDetail({ params }) {
                 </div>
 
                 <div className="flex-1">
+                  <div className="flex gap-2 mb-3">
+                    {answer.isPinned && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                        <Pin size={12} /> Pinned
+                      </span>
+                    )}
+                    {answer.isOfficial && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        <ShieldCheck size={12} /> Official Answer
+                      </span>
+                    )}
+                  </div>
                   <div className="text-slate-200 whitespace-pre-wrap mb-4 font-mono text-sm leading-relaxed bg-slate-900/30 p-4 rounded-lg">
                     {answer.content}
                   </div>
@@ -192,14 +235,30 @@ export default function QuestionDetail({ params }) {
                   )}
 
                   <div className="flex justify-between items-end mt-6">
-                    <div>
-                      {user && (user.role === 'admin' || user.role === 'hr') && !answer.isAccepted && (
-                        <button 
-                          onClick={() => handleAccept(answer._id)}
-                          className="text-sm text-green-400 hover:text-green-300 border border-green-500/30 hover:bg-green-500/10 px-3 py-1.5 rounded transition-all"
-                        >
-                          Mark as Accepted
-                        </button>
+                    <div className="flex gap-2">
+                      {user && (user.role === 'admin' || user.role === 'hr') && (
+                        <>
+                          {!answer.isAccepted && (
+                            <button 
+                              onClick={() => handleAccept(answer._id)}
+                              className="text-sm text-green-400 hover:text-green-300 border border-green-500/30 hover:bg-green-500/10 px-3 py-1.5 rounded transition-all"
+                            >
+                              Mark as Accepted
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleTogglePin(answer._id)}
+                            className={`text-sm ${answer.isPinned ? 'text-yellow-400 border-yellow-500/50 bg-yellow-500/10' : 'text-slate-400 border-slate-600 hover:text-yellow-400'} border px-3 py-1.5 rounded transition-all flex items-center gap-1`}
+                          >
+                            <Pin size={14} /> {answer.isPinned ? 'Unpin' : 'Pin'}
+                          </button>
+                          <button 
+                            onClick={() => handleToggleOfficial(answer._id)}
+                            className={`text-sm ${answer.isOfficial ? 'text-blue-400 border-blue-500/50 bg-blue-500/10' : 'text-slate-400 border-slate-600 hover:text-blue-400'} border px-3 py-1.5 rounded transition-all flex items-center gap-1`}
+                          >
+                            <ShieldCheck size={14} /> {answer.isOfficial ? 'Remove Official' : 'Make Official'}
+                          </button>
+                        </>
                       )}
                     </div>
                     <div className="text-right text-sm">

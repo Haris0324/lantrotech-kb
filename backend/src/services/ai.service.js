@@ -45,7 +45,20 @@ const generateInsights = async (questions) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const questionText = questions.map(q => q.title).join('\n');
-    const prompt = `Analyze these recent employee questions to identify knowledge gaps. Provide a short summary of trending topics and areas where training might be needed.\n\nQuestions:\n${questionText}`;
+    const prompt = `Analyze these recent employee questions to identify knowledge gaps and trends. 
+Please structure your response in Markdown with EXACTLY these three sections:
+
+### 1. Knowledge Gap Analysis
+Identify specific areas where employees are struggling repeatedly (e.g., repeated Docker-related queries indicating a need for training or documentation improvement).
+
+### 2. Auto-FAQ Generator
+Summarize the most important and frequently asked questions into a structured internal FAQ format (Question and short Answer summary).
+
+### 3. Trending Topics Detection
+Detect spikes in specific topics or issues to highlight emerging technical or operational concerns.
+
+Questions Data:
+${questionText}`;
     
     const result = await model.generateContent(prompt);
     return result.response.text();

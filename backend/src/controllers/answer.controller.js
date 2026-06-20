@@ -6,7 +6,7 @@ const getAnswersForQuestion = async (req, res) => {
   try {
     const answers = await Answer.find({ questionId: req.params.questionId })
       .populate('author', 'name role department')
-      .sort({ isAccepted: -1, upvotes: -1 });
+      .sort({ isPinned: -1, isAccepted: -1, upvotes: -1 });
     res.json(answers);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -111,4 +111,50 @@ const acceptAnswer = async (req, res) => {
   }
 };
 
-module.exports = { getAnswersForQuestion, postAnswer, voteAnswer, acceptAnswer };
+const togglePin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const answer = await Answer.findById(id);
+    if (!answer) return res.status(404).json({ message: 'Answer not found' });
+
+    answer.isPinned = !answer.isPinned;
+    await answer.save();
+
+    const reqIo = req.app.get('io');
+    if (reqIo) {
+      reqIo.to(`question_${answer.questionId}`).emit('answerPinned', {
+        answerId: answer._id,
+        isPinned: answer.isPinned
+      });
+    }
+
+    res.json(answer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const toggleOfficial = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const answer = await Answer.findById(id);
+    if (!answer) return res.status(404).json({ message: 'Answer not found' });
+
+    answer.isOfficial = !answer.isOfficial;
+    await answer.save();
+
+    const reqIo = req.app.get('io');
+    if (reqIo) {
+      reqIo.to(`question_${answer.questionId}`).emit('answerOfficial', {
+        answerId: answer._id,
+        isOfficial: answer.isOfficial
+      });
+    }
+
+    res.json(answer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getAnswersForQuestion, postAnswer, voteAnswer, acceptAnswer, togglePin, toggleOfficial };
