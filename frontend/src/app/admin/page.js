@@ -113,7 +113,9 @@ export default function AdminDashboard() {
             </div>
             <div>
               <p className="text-sm font-medium text-slate-400">AI Insights Run</p>
-              <h3 className="text-3xl font-bold text-white">Yes</h3>
+              <h3 className={`text-3xl font-bold ${data?.insights?.startsWith('Failed') || data?.insights?.startsWith('AI Service') ? 'text-red-400' : 'text-white'}`}>
+                {data?.insights?.startsWith('Failed') || data?.insights?.startsWith('AI Service') ? 'Failed' : 'Yes'}
+              </h3>
             </div>
           </div>
 

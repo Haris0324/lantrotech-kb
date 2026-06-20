@@ -40,7 +40,7 @@ Respond strictly in the above format.`;
 };
 
 const generateInsights = async (questions) => {
-  if (!process.env.GEMINI_API_KEY) return "AI insights unavailable.";
+  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'dummy_key_for_init') return "AI Service currently disabled (No API Key).";
   
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -64,7 +64,7 @@ ${questionText}`;
     return result.response.text();
   } catch (error) {
     console.error('AI Insights Error:', error);
-    return "Failed to generate insights.";
+    return `Failed to generate insights. Error: ${error.message}`;
   }
 };
 

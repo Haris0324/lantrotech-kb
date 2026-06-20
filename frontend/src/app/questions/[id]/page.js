@@ -245,10 +245,22 @@ export default function QuestionDetail({ params }) {
                     </div>
                   )}
                   {answer.aiFeedback && answer.aiFeedback.status === 'pending' && (
-                    <div className="mt-4 flex items-center gap-2 text-sm text-blue-400 bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg">
-                      <Loader2 size={16} className="animate-spin" />
-                      AI is verifying this answer...
-                    </div>
+                    new Date() - new Date(answer.createdAt) > 120000 ? (
+                      <div className="mt-4 p-4 rounded-lg border flex gap-3 bg-red-500/10 border-red-500/30 text-red-300">
+                        <Bot size={20} className="mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-semibold text-sm mb-1 uppercase tracking-wider">
+                            AI Analysis: Flagged
+                          </p>
+                          <p className="text-sm opacity-90">AI verification timed out or failed.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-4 flex items-center gap-2 text-sm text-blue-400 bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg">
+                        <Loader2 size={16} className="animate-spin" />
+                        AI is verifying this answer...
+                      </div>
+                    )
                   )}
 
                   <div className="flex justify-between items-end mt-6">
