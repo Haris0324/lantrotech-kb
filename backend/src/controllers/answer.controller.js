@@ -22,6 +22,11 @@ const postAnswer = async (req, res) => {
       return res.status(404).json({ message: 'Question not found' });
     }
 
+    const existingAnswer = await Answer.findOne({ questionId, author: req.user._id });
+    if (existingAnswer) {
+      return res.status(400).json({ message: 'You have already answered this question.' });
+    }
+
     const answer = await Answer.create({
       content,
       questionId,

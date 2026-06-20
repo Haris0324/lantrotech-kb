@@ -154,6 +154,8 @@ export default function QuestionDetail({ params }) {
 
   if (!question) return <div className="p-8 text-center text-white">Question not found.</div>;
 
+  const hasAnswered = user && answers.some(a => a.author?._id === user._id);
+
   return (
     <>
       <Navbar />
@@ -296,9 +298,14 @@ export default function QuestionDetail({ params }) {
         </div>
 
         {user && user._id !== question.author?._id ? (
-          <div className="glass-panel p-6">
-            <h3 className="text-lg font-bold text-white mb-4">Your Answer</h3>
-            <form onSubmit={handlePostAnswer}>
+          hasAnswered ? (
+            <div className="glass-panel p-6 text-center text-slate-400">
+              You have already answered this question. Thank you for your contribution!
+            </div>
+          ) : (
+            <div className="glass-panel p-6">
+              <h3 className="text-lg font-bold text-white mb-4">Your Answer</h3>
+              <form onSubmit={handlePostAnswer}>
               <textarea
                 required
                 rows={6}
@@ -319,6 +326,7 @@ export default function QuestionDetail({ params }) {
               </div>
             </form>
           </div>
+          )
         ) : user && user._id === question.author?._id ? (
           <div className="glass-panel p-6 text-center text-slate-400">
             You cannot answer your own question. Please wait for other employees to share their knowledge.
