@@ -90,6 +90,12 @@ export default function Home() {
             >
               Popular
             </button>
+            <button
+              onClick={() => setFilter('unresolved')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'unresolved' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+            >
+              Unresolved
+            </button>
           </div>
         </div>
 

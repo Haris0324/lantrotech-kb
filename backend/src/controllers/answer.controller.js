@@ -63,8 +63,20 @@ const voteAnswer = async (req, res) => {
     const answer = await Answer.findById(id);
     if (!answer) return res.status(404).json({ message: 'Answer not found' });
 
-    if (type === 'upvote') answer.upvotes += 1;
-    else if (type === 'downvote') answer.downvotes += 1;
+    const userId = req.user._id;
+
+    // Remove user from both arrays first to prevent duplicate voting
+    answer.upvotedBy = answer.upvotedBy.filter(uId => uId.toString() !== userId.toString());
+    answer.downvotedBy = answer.downvotedBy.filter(uId => uId.toString() !== userId.toString());
+
+    if (type === 'upvote') {
+      answer.upvotedBy.push(userId);
+    } else if (type === 'downvote') {
+      answer.downvotedBy.push(userId);
+    }
+
+    answer.upvotes = answer.upvotedBy.length;
+    answer.downvotes = answer.downvotedBy.length;
 
     await answer.save();
     

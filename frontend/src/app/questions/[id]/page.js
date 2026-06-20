@@ -93,7 +93,13 @@ export default function QuestionDetail({ params }) {
     if (!newAnswer.trim()) return;
     setSubmitting(true);
     try {
-      await api.post('/answers', { questionId: id, content: newAnswer });
+      const res = await api.post('/answers', { questionId: id, content: newAnswer });
+      setAnswers(prev => {
+        if (!prev.find(a => a._id === res.data._id)) {
+          return [...prev, res.data];
+        }
+        return prev;
+      });
       setNewAnswer('');
     } catch (error) {
       console.error(error);
@@ -103,7 +109,10 @@ export default function QuestionDetail({ params }) {
 
   const handleVote = async (answerId, type) => {
     try {
-      await api.put(`/answers/${answerId}/vote`, { type });
+      const res = await api.put(`/answers/${answerId}/vote`, { type });
+      setAnswers(prev => prev.map(a => 
+        a._id === res.data._id ? { ...a, upvotes: res.data.upvotes, downvotes: res.data.downvotes } : a
+      ));
     } catch (error) {
       console.error(error);
     }
@@ -111,7 +120,11 @@ export default function QuestionDetail({ params }) {
 
   const handleAccept = async (answerId) => {
     try {
-      await api.put(`/answers/${answerId}/accept`);
+      const res = await api.put(`/answers/${answerId}/accept`);
+      setAnswers(prev => prev.map(a => 
+        a._id === res.data._id ? { ...a, isAccepted: true } : a
+      ));
+      setQuestion(prev => ({ ...prev, status: 'resolved' }));
     } catch (error) {
       console.error(error);
     }
@@ -175,8 +188,10 @@ export default function QuestionDetail({ params }) {
         <div className="mb-8">
           <h2 className="text-xl font-bold text-white mb-4">{answers.length} Answers</h2>
           <div className="space-y-6">
-            {answers.map(answer => (
-              <div key={answer._id} className={`glass-panel p-6 flex gap-6 ${answer.isAccepted ? 'ring-2 ring-green-500/50 bg-green-900/10' : ''}`}>
+            {answers.map(answer => {
+              const isHighlyUpvoted = answer.upvotes >= 10;
+              return (
+              <div key={answer._id} className={`glass-panel p-6 flex gap-6 ${answer.isAccepted ? 'ring-2 ring-green-500/50 bg-green-900/10' : isHighlyUpvoted ? 'ring-1 ring-blue-500/30' : ''}`}>
                 <div className="flex flex-col items-center gap-3 min-w-[50px]">
                   <button onClick={() => handleVote(answer._id, 'upvote')} className="text-slate-400 hover:text-blue-400 transition-colors p-2 hover:bg-slate-800 rounded-full">
                     <ThumbsUp size={24} />
@@ -273,9 +288,9 @@ export default function QuestionDetail({ params }) {
                       </div>
                     </div>
                   </div>
-                </div>
               </div>
-            ))}
+            );
+          })}
           </div>
         </div>
 

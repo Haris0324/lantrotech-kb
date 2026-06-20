@@ -6,6 +6,8 @@ const AnswerSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   upvotes: { type: Number, default: 0 },
   downvotes: { type: Number, default: 0 },
+  upvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  downvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   isAccepted: { type: Boolean, default: false },
   isOfficial: { type: Boolean, default: false },
   isPinned: { type: Boolean, default: false },

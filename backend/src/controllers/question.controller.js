@@ -11,6 +11,9 @@ const getQuestions = async (req, res) => {
     let sortQuery = { createdAt: -1 }; // default recent
     if (sort === 'popular') {
       sortQuery = { views: -1 };
+    } else if (sort === 'unresolved') {
+      query.status = 'open';
+      sortQuery = { createdAt: -1 };
     }
 
     const questions = await Question.find(query)
