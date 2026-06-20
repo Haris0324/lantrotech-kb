@@ -9,7 +9,7 @@ const verifyAnswerWithAI = async (questionContent, answerContent) => {
   }
   
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const prompt = `You are an AI assistant for a corporate knowledge base.
 Question: "${questionContent}"
 Answer provided: "${answerContent}"
@@ -43,7 +43,7 @@ const generateInsights = async (questions) => {
   if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'dummy_key_for_init') return "AI Service currently disabled (No API Key).";
   
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const questionText = questions.map(q => q.title).join('\n');
     const prompt = `Analyze these recent employee questions to identify knowledge gaps and trends. 
 Please structure your response in Markdown with EXACTLY these three sections:
