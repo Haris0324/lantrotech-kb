@@ -220,7 +220,7 @@ export default function QuestionDetail({ params }) {
           </div>
         </div>
 
-        {user ? (
+        {user && user._id !== question.author?._id ? (
           <div className="glass-panel p-6">
             <h3 className="text-lg font-bold text-white mb-4">Your Answer</h3>
             <form onSubmit={handlePostAnswer}>
@@ -243,6 +243,10 @@ export default function QuestionDetail({ params }) {
                 </button>
               </div>
             </form>
+          </div>
+        ) : user && user._id === question.author?._id ? (
+          <div className="glass-panel p-6 text-center text-slate-400">
+            You cannot answer your own question. Please wait for other employees to share their knowledge.
           </div>
         ) : (
           <div className="glass-panel p-6 text-center text-slate-400">

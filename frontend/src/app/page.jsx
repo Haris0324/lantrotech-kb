@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { MessageSquare, Eye, CheckCircle, Search, PlusCircle, Filter } from 'lucide-react';
 import { useSocket } from '@/context/SocketContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
   const [questions, setQuestions] = useState([]);
@@ -13,6 +14,7 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('recent'); // recent, popular
   const socket = useSocket();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchQuestions();
@@ -53,7 +55,7 @@ export default function Home() {
             <p className="text-slate-400 mt-1">Discover, learn, and share knowledge.</p>
           </div>
           <Link 
-            href="/ask" 
+            href={user ? "/ask" : "/login"} 
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-blue-500/20 hover-glow"
           >
             <PlusCircle size={20} />
